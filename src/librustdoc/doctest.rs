@@ -690,8 +690,11 @@ pub(crate) fn make_test(
         let inner_attr = if test_id.is_some() { "#[allow(non_snake_case)] " } else { "" };
         let (main_pre, main_post) = if returns_result {
             (
+                // `Result` is qualified even if it is not needed so that there is a lower
+                // chance of collision for use cases that extract the doctest via a custom
+                // test builder and insert it elsewhere.
                 format!(
-                    "fn main() {{ {inner_attr}fn {inner_fn_name}() -> Result<(), impl core::fmt::Debug> {{\n",
+                    "fn main() {{ {inner_attr}fn {inner_fn_name}() -> core::result::Result<(), impl core::fmt::Debug> {{\n",
                 ),
                 format!("\n}} {inner_fn_name}().unwrap() }}"),
             )
